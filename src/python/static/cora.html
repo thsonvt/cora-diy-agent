@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1d493e">
+  <title>Cora — Your Zava DIY companion</title>
+  <style>
+    :root { color-scheme: light; --ink:#233e35; --green:#1d493e; --muted:#6b766e; --line:#e2e6df; --paper:#fafbf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button,textarea { font:inherit; }
+    button { cursor:pointer; }
+    button:disabled { cursor:wait; opacity:.5; }
+    button:focus-visible,textarea:focus-visible { outline:3px solid #92bba9; outline-offset:3px; }
+    [hidden] { display:none !important; }
+    .app { height:100dvh; display:flex; flex-direction:column; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:19px 36px; border-bottom:1px solid var(--line); background:#fff; }
+    .brand { display:flex; align-items:center; gap:22px; }
+    .wordmark { font-size:23px; font-weight:850; letter-spacing:4px; }
+    .brand-divider { height:24px; border-left:1px solid var(--line); }
+    .brand-subtitle { color:var(--muted); font-size:13px; }
+    .new-chat { padding:8px 15px; border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink); font-size:13px; }
+    .new-chat:hover { background:#f0f4ee; }
+    .layout { flex:1; display:grid; grid-template-columns:246px minmax(0,1fr); min-height:0; max-width:1440px; width:100%; margin:0 auto; }
+    aside { padding:38px 28px; border-right:1px solid var(--line); display:flex; flex-direction:column; }
+    .eyebrow { color:var(--muted); font-size:10px; letter-spacing:1.8px; font-weight:700; text-transform:uppercase; }
+    .companion { display:flex; gap:12px; align-items:center; margin-top:18px; }
+    .avatar { width:40px; height:40px; border-radius:13px; background:var(--green); color:white; display:grid; place-items:center; font:italic 27px Georgia,serif; flex-shrink:0; }
+    .companion strong { display:block; font-size:16px; }
+    .companion small { color:var(--muted); font-size:12px; }
+    .side-note { margin-top:45px; font-size:13px; color:var(--muted); }
+    .side-note strong { color:var(--ink); font-weight:600; }
+    .side-note ul { padding-left:17px; }
+    .side-note li { margin:10px 0; }
+    .side-bottom { margin-top:auto; padding-top:24px; color:var(--muted); font-size:11px; }
+    .workspace { display:flex; flex-direction:column; min-height:0; min-width:0; }
+    .scroll-area { flex:1; overflow-y:auto; padding:32px 36px 20px; scroll-behavior:smooth; }
+    .welcome { max-width:730px; margin:6vh auto 32px; }
+    .welcome .avatar { width:58px; height:58px; border-radius:18px; font-size:38px; margin-bottom:27px; }
+    .welcome .eyebrow { color:#5d806c; }
+    h1 { font-size:clamp(32px,4vw,48px); line-height:1.16; letter-spacing:-1.8px; font-weight:550; margin:12px 0 20px; max-width:600px; }
+    .intro { color:var(--muted); max-width:490px; font-size:15px; }
+    .suggestions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:32px; }
+    .suggestion { text-align:left; border:1px solid var(--line); background:white; border-radius:12px; padding:18px 16px; color:var(--ink); transition:transform .15s,border-color .15s; }
+    .suggestion:hover { transform:translateY(-2px); border-color:#8dac98; }
+    .suggestion span { display:block; font-size:19px; margin-bottom:14px; }
+    .suggestion strong { display:block; font-size:13px; font-weight:600; }
+    .suggestion small { display:block; color:var(--muted); font-size:11px; margin-top:5px; }
+    .messages { max-width:730px; margin:0 auto; }
+    .message { margin:8px 0 28px; }
+    .message-label { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:650; color:var(--muted); margin-bottom:8px; }
+    .message-label .avatar { width:24px; height:24px; border-radius:7px; font-size:18px; }
+    .bubble { white-space:pre-wrap; overflow-wrap:anywhere; font-size:15px; line-height:1.75; }
+    .message.user { margin-left:auto; max-width:85%; }
+    .user .message-label { justify-content:flex-end; }
+    .user .bubble { padding:14px 19px; background:#eaf0e7; border-radius:14px 14px 3px 14px; }
+    .message img { display:block; max-width:min(300px,100%); max-height:230px; border-radius:10px; margin:12px 0; object-fit:contain; }
+    .failed { color:#9a4031; font-size:12px; margin-top:8px; }
+    .composer-area { padding:12px 36px 20px; }
+    .composer-wrap { max-width:730px; margin:auto; }
+    .composer { border:1px solid #d5ded3; background:white; border-radius:16px; box-shadow:0 4px 22px #223c3406; padding:14px; }
+    textarea { display:block; resize:vertical; min-height:56px; max-height:150px; width:100%; border:0; outline:0; padding:2px 5px 10px; color:var(--ink); background:transparent; }
+    textarea::placeholder { color:#929c93; }
+    .composer-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .attach { display:flex; align-items:center; gap:7px; padding:7px 9px; border:0; background:transparent; border-radius:7px; color:var(--muted); font-size:12px; }
+    .attach:hover { background:#f1f5ee; }
+    svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+    .send { display:flex; align-items:center; gap:9px; padding:9px 18px; border:0; background:var(--green); border-radius:9px; color:white; font-size:13px; }
+    .send:hover { background:#2b6052; }
+    .attachment { display:flex; align-items:center; gap:10px; padding:0 5px 12px; color:var(--muted); font-size:12px; }
+    .attachment img { width:40px; height:40px; object-fit:cover; border-radius:6px; }
+    .attachment button { border:0; border-radius:4px; color:var(--muted); background:#f0f4ee; padding:4px 8px; }
+    .filename { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .footer-note { text-align:center; color:var(--muted); font-size:10px; margin:10px 0 0; }
+    .status { color:var(--muted); font-size:12px; min-height:20px; padding:0 5px 7px; }
+    .error { color:#983f31; background:#fff1ec; padding:10px 14px; border-radius:8px; margin-bottom:10px; font-size:13px; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media(max-height:780px) { .welcome { margin:0 auto 16px; } .welcome .avatar { width:40px; height:40px; font-size:28px; margin-bottom:16px; } h1 { font-size:36px; } .suggestions { margin-top:20px; } .suggestion { padding:14px; } .suggestion span { margin-bottom:8px; } }
+    @media(max-width:800px) { .layout { grid-template-columns:minmax(0,1fr); } aside { display:none; } header { padding:15px 20px; } .scroll-area { padding:24px 20px 12px; } .composer-area { padding:8px 20px 14px; } .welcome { margin-top:4vh; } }
+    @media(max-width:480px) { .brand-subtitle,.brand-divider { display:none; } .suggestions { grid-template-columns:1fr; gap:8px; margin-top:16px; } .suggestion { padding:9px 14px; } .suggestion span,.suggestion small,.welcome .avatar,h1 br { display:none; } .welcome { margin-top:0; } h1 { font-size:30px; line-height:1.2; letter-spacing:-1px; margin-bottom:14px; } .intro { font-size:14px; line-height:1.55; } .footer-note { font-size:9px; } }
+    @media(prefers-reduced-motion:reduce) { .scroll-area { scroll-behavior:auto; } .suggestion { transition:none; } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><span class="wordmark">ZAVA</span><span class="brand-divider"></span><span class="brand-subtitle">Good things start at home.</span></div>
+    <button class="new-chat" id="new-chat" disabled>＋ New chat</button>
+  </header>
+  <div class="layout">
+    <aside aria-label="About Cora">
+      <div class="eyebrow">A helping hand</div>
+      <div class="companion"><div class="avatar" aria-hidden="true">c</div><div><strong>Cora</strong><small>Your DIY companion</small></div></div>
+      <div class="side-note"><strong>Big ideas. Small first steps.</strong><p>Tell me what you have in mind, and we’ll work through it together.</p><ul><li>Find a product for your project</li><li>Explore colors and finishes</li><li>Ask about Zava’s catalog</li></ul></div>
+      <div class="side-bottom">Have a space in mind?<br>Attach a photo to give Cora a closer look.</div>
+    </aside>
+    <main class="workspace">
+      <div class="scroll-area" id="scroll-area">
+        <section class="welcome" id="welcome" aria-labelledby="welcome-heading">
+          <div class="avatar" aria-hidden="true">c</div><div class="eyebrow">Meet Cora, from Zava</div>
+          <h1 id="welcome-heading">Let’s make your space<br> feel like you.</h1>
+          <p class="intro">A fresh coat of paint. A weekend project. A little advice.<br>Whatever you’re imagining, I’m here to help you get started.</p>
+          <div class="suggestions">
+            <button class="suggestion" data-prompt="Help me find an eggshell paint for my living room."><span aria-hidden="true">◒</span><strong>Find the right paint ↗</strong><small>A fresh start for your walls</small></button>
+            <button class="suggestion" data-prompt="I want to refresh my living room this weekend. Where should I start?"><span aria-hidden="true">⌂</span><strong>Plan a room refresh ↗</strong><small>Make the most of your space</small></button>
+            <button class="suggestion" data-prompt="How much is Zava’s eggshell paint?"><span aria-hidden="true">⊞</span><strong>Explore Zava products ↗</strong><small>Find something that fits</small></button>
+          </div>
+        </section>
+        <div class="messages" id="messages" role="log" aria-label="Conversation with Cora" aria-live="polite" aria-relevant="additions text"></div>
+      </div>
+      <div class="composer-area"><div class="composer-wrap">
+        <div class="error" id="error" role="alert" hidden></div>
+        <div class="status" id="status" role="status">Connecting to Cora…</div>
+        <form id="chat-form" class="composer" aria-label="Send a message to Cora">
+          <div class="attachment" id="attachment" hidden><img id="preview" alt="Selected image"><span class="filename" id="filename"></span><button type="button" id="remove-image" aria-label="Remove attached image">×</button></div>
+          <label for="message" class="sr-only">Your message</label>
+          <textarea id="message" maxlength="4000" rows="2" placeholder="Tell me about your next project…" required disabled></textarea>
+          <div class="composer-actions">
+            <input type="file" id="image" accept="image/png,image/jpeg,image/webp" hidden>
+            <button type="button" class="attach" id="attach" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 5 5 3-3 4 4"/></svg>Add a photo</button>
+            <button type="submit" class="send" id="send" disabled>Send <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
+          </div>
+        </form>
+        <p class="footer-note">Cora can make mistakes. Check product details before you buy. Photos: PNG, JPEG or WebP, up to 5 MB.</p>
+      </div></div>
+    </main>
+  </div>
+</div>
+<script>
+  const $ = id => document.getElementById(id);
+  let conversationId = null;
+  let busy = false;
+  let imageUrl = null;
+
+  function showError(message) {
+    $('error').textContent = message;
+    $('error').hidden = !message;
+  }
+  function setBusy(value) {
+    busy = value;
+    for (const id of ['message', 'attach', 'send', 'remove-image']) $(id).disabled = value || !conversationId;
+    $('new-chat').disabled = value;
+    $('chat-form').setAttribute('aria-busy', String(value));
+    $('status').textContent = value ? 'Cora is thinking…' : '';
+  }
+  function clearImage() {
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
+    imageUrl = null;
+    $('image').value = '';
+    $('preview').removeAttribute('src');
+    $('attachment').hidden = true;
+  }
+  async function errorMessage(response) {
+    const data = await response.json().catch(() => ({}));
+    return typeof data.detail === 'string' ? data.detail : 'Unable to send this message. Check the server and try again.';
+  }
+  async function newChat() {
+    setBusy(true);
+    showError('');
+    try {
+      if (conversationId) {
+        const deleted = await fetch(`/api/conversations/${conversationId}`, { method: 'DELETE' });
+        if (!deleted.ok && deleted.status !== 404) throw new Error(await errorMessage(deleted));
+        conversationId = null;
+      }
+      const response = await fetch('/api/conversations', { method: 'POST' });
+      if (!response.ok) throw new Error(await errorMessage(response));
+      conversationId = (await response.json()).id;
+      $('messages').replaceChildren();
+      $('welcome').hidden = false;
+      $('message').value = '';
+      clearImage();
+    } catch (error) {
+      showError(error.message || 'Couldn’t connect to Cora. Check that the server is running, then choose New chat.');
+    } finally {
+      setBusy(false);
+      if (conversationId) $('message').focus();
+    }
+  }
+  function addMessage(role, text, file) {
+    const article = document.createElement('article');
+    article.className = `message ${role}`;
+    const label = document.createElement('div');
+    label.className = 'message-label';
+    if (role === 'assistant') {
+      const avatar = document.createElement('span');
+      avatar.className = 'avatar';
+      avatar.setAttribute('aria-hidden', 'true');
+      avatar.textContent = 'c';
+      label.append(avatar);
+    }
+    label.append(document.createTextNode(role === 'user' ? 'You' : 'Cora'));
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    article.append(label, bubble);
+    if (file) {
+      const image = document.createElement('img');
+      const url = URL.createObjectURL(file);
+      image.src = url;
+      image.alt = 'Your attached project photo';
+      image.onload = image.onerror = () => URL.revokeObjectURL(url);
+      article.append(image);
+    }
+    $('messages').append(article);
+    return { article, bubble };
+  }
+  function scrollToLatest() {
+    $('scroll-area').scrollTop = $('scroll-area').scrollHeight;
+  }
+  $('attach').addEventListener('click', () => $('image').click());
+  $('remove-image').addEventListener('click', clearImage);
+  $('new-chat').addEventListener('click', newChat);
+  for (const button of document.querySelectorAll('[data-prompt]')) {
+    button.addEventListener('click', () => {
+      if (busy || !conversationId) return;
+      $('message').value = button.dataset.prompt;
+      $('message').focus();
+    });
+  }
+  $('image').addEventListener('change', () => {
+    const file = $('image').files[0];
+    if (!file) return;
+    showError('');
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      clearImage();
+      showError('Choose a PNG, JPEG, or WebP image up to 5 MB.');
+      return;
+    }
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
+    imageUrl = URL.createObjectURL(file);
+    $('preview').src = imageUrl;
+    $('filename').textContent = file.name;
+    $('attachment').hidden = false;
+  });
+  $('message').addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      $('chat-form').requestSubmit();
+    }
+  });
+  $('chat-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const message = $('message').value.trim();
+    if (busy || !conversationId || !message) return;
+    const file = $('image').files[0];
+    const data = new FormData();
+    data.append('message', message);
+    if (file) data.append('image', file);
+    setBusy(true);
+    showError('');
+    $('welcome').hidden = true;
+    const user = addMessage('user', message, file);
+    const assistant = addMessage('assistant', '');
+    scrollToLatest();
+    let complete = false;
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}/messages`, { method: 'POST', body: data });
+      if (!response.ok) throw new Error(await errorMessage(response));
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        buffer += decoder.decode(value, { stream: !done });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const update = JSON.parse(line);
+          if (update.type === 'text') assistant.bubble.textContent += update.text;
+          if (update.type === 'replace') assistant.bubble.textContent = update.text;
+          if (update.type === 'status') $('status').textContent = update.text;
+          if (update.type === 'error') throw new Error(update.text);
+          if (update.type === 'done') complete = true;
+        }
+        scrollToLatest();
+        if (done) break;
+      }
+      if (!complete) throw new Error('The reply was interrupted. Please try again.');
+      if (!assistant.bubble.textContent) assistant.bubble.textContent = 'No text reply was returned. Please try rephrasing your request.';
+      $('message').value = '';
+      clearImage();
+    } catch (error) {
+      if (!assistant.bubble.textContent) assistant.article.remove();
+      const failed = document.createElement('div');
+      failed.className = 'failed';
+      failed.textContent = 'Reply interrupted. You can send your message again.';
+      user.article.append(failed);
+      showError(error.message || 'Connection lost. Check the server and try again.');
+    } finally {
+      setBusy(false);
+      $('message').focus();
+      scrollToLatest();
+    }
+  });
+  newChat();
+</script>
+</body>
+</html>

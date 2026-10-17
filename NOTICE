@@ -1,0 +1,18 @@
+Cora DIY Agent
+
+This is an independent adaptation of the Microsoft Ignite 2025 LAB512 sample:
+https://github.com/microsoft/ignite25-LAB512-prototyping-multimodal-agents-with-microsoft-foundry-and-the-ai-toolkit
+
+The Zava assistant instructions, customer-sales MCP server, PostgreSQL helper,
+database initialization script, sample database backup, and example room image
+originate from that repository. Their original Microsoft copyright notice is
+preserved in LICENSE. LICENSE-DOCS preserves the upstream CC BY-SA 4.0 text for
+inherited documentation and instructional content.
+
+This adaptation adds the browser UI, streaming HTTP server, conversation-session
+handling, tests, environment configuration, and public setup documentation.
+
+Code is distributed under the MIT license in LICENSE. This repository's README
+and inherited instructional content are available under CC BY-SA 4.0 as set out
+in LICENSE-DOCS. Brand and product names identify the sample and its dependencies;
+this project is not an official Microsoft product or an endorsement by Microsoft.
