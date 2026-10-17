@@ -22,4 +22,3 @@ services:
 
 volumes:
   cora_postgres_data:
-

@@ -72,7 +72,7 @@ async def main() -> None:
             async for chunk in agent.run([user_input], stream=True):
                 # log tool calls if any
                 function_calls = [
-                    c for c in chunk.contents 
+                    c for c in chunk.contents
                     if c.type == "function_call"
                 ]
                 for call in function_calls:
@@ -82,7 +82,7 @@ async def main() -> None:
                 if chunk.text:
                     print(chunk.text, end="")
             print("")
-        
+
         print("\n--- All tasks completed successfully ---")
 
     # Give additional time for all async cleanup to complete

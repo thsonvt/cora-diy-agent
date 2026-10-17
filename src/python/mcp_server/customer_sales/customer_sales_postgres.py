@@ -105,7 +105,7 @@ class PostgreSQLCustomerSales:
         conn = None
         try:
             max_rows = min(max_rows, 100)  # Limit to 100 for performance
-            
+
             conn = await self.get_connection()
 
             await conn.execute(
@@ -162,7 +162,7 @@ class PostgreSQLCustomerSales:
 
     async def search_products_by_similarity(self, query_embedding: list[float], rls_user_id: str, max_rows: int = 10, similarity_threshold: float = 50.0) -> str:
         """Search for products by similarity using pgvector cosine similarity.
-        
+
         Args:
             query_embedding: The embedding vector to search for similar products
             max_rows: Maximum number of rows to return
@@ -172,12 +172,12 @@ class PostgreSQLCustomerSales:
         conn = None
         try:
             max_rows = min(max_rows, 100)  # Limit to 100 for performance
-            
+
             # Convert similarity percentage threshold to distance threshold
             # Similarity percentage = (1 - distance) * 100
             # So distance = 1 - (similarity_percentage / 100)
             distance_threshold = 1.0 - (similarity_threshold / 100.0)
-            
+
             conn = await self.get_connection()
 
             await conn.execute(
@@ -187,7 +187,7 @@ class PostgreSQLCustomerSales:
             embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
 
             query = f"""
-                SELECT 
+                SELECT
                     p.product_name,
                     p.product_description,
                     p.base_price as price,
